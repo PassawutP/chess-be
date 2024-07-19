@@ -8,12 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class GameMessage {
-    private Integer gameId;
+    private String moveFrom;
 
-    private String board;
+    private String moveTo;
 
     private String turn;
-
-    private String status;
-
 }

@@ -23,6 +23,8 @@ public class Game {
 
     private String status;
 
+    private String board;
+
     private Integer playerNum;
 
 }
