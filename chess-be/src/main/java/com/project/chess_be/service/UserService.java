@@ -1,5 +1,6 @@
 package com.project.chess_be.service;
 
+import com.project.chess_be.entities.Game;
 import com.project.chess_be.entities.User;
 import com.project.chess_be.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
