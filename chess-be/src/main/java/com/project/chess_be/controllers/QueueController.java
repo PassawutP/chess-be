@@ -1,5 +1,6 @@
 package com.project.chess_be.controllers;
 
+import com.github.bhlangonijr.chesslib.Board;
 import com.project.chess_be.entities.Game;
 import com.project.chess_be.entities.User;
 import com.project.chess_be.models.QueueMessage;
@@ -36,44 +37,47 @@ public class QueueController {
         if ( count > 0 ){
             int randomisedRoomInt = (int)(Math.random() * count);
             int gameId = room.get(randomisedRoomInt).getGameId();
-            Game game = Game.builder().gameId(gameId).status("READY").playerNum(2).turn("WHITE").build();
-            Game updatedGame = gameService.updateGame(game);
-            Optional<User> user = userService.getUser(userId);
-            if (user.isPresent()){
-                User senderUser = user.get();
-                User otherUser = userService.getUserIdByGameId( gameId ).get(0);
-                int randomisedSideInt = (int)(Math.random() * 2);
-                switch (randomisedSideInt){
-                    case 0:
-                    {
-                        QueueMessage senderStatus = QueueMessage.builder().status("READY").side("WHITE").build();
-                        simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
-                        senderUser.setSide("WHITE");
-                        senderUser.setGame(updatedGame);
-                        userService.saveUser(senderUser);
+            Optional<Game> getGame = gameService.getGameById(gameId);
+            if (getGame.isPresent()){
+                Game game = Game.builder().gameId(gameId).status("READY").playerNum(2).turn("WHITE").board(getGame.get().getBoard()).build();
+                Game updatedGame = gameService.updateGame(game);
+                Optional<User> user = userService.getUser(userId);
+                if (user.isPresent()){
+                    User senderUser = user.get();
+                    User otherUser = userService.getUserIdByGameId( gameId ).get(0);
+                    int randomisedSideInt = (int)(Math.random() * 2);
+                    switch (randomisedSideInt){
+                        case 0:
+                        {
+                            QueueMessage senderStatus = QueueMessage.builder().status("READY").side("WHITE").build();
+                            simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
+                            senderUser.setSide("WHITE");
+                            senderUser.setGame(updatedGame);
+                            userService.saveUser(senderUser);
 
-                        QueueMessage otherStatus = QueueMessage.builder().status("READY").side("BLACK").build();
-                        simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
-                        otherUser.setSide("BLACK");
-                        userService.saveUser(otherUser);
-                    }
-                    case 1:
-                    {
-                        QueueMessage senderStatus = QueueMessage.builder().status("READY").side("BLACK").build();
-                        simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
-                        senderUser.setSide("BLACK");
-                        senderUser.setGame(updatedGame);
-                        userService.saveUser(senderUser);
+                            QueueMessage otherStatus = QueueMessage.builder().status("READY").side("BLACK").build();
+                            simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
+                            otherUser.setSide("BLACK");
+                            userService.saveUser(otherUser);
+                        }
+                        case 1:
+                        {
+                            QueueMessage senderStatus = QueueMessage.builder().status("READY").side("BLACK").build();
+                            simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
+                            senderUser.setSide("BLACK");
+                            senderUser.setGame(updatedGame);
+                            userService.saveUser(senderUser);
 
-                        QueueMessage otherStatus = QueueMessage.builder().status("READY").side("WHITE").build();
-                        simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
-                        otherUser.setSide("WHITE");
-                        userService.saveUser(otherUser);
+                            QueueMessage otherStatus = QueueMessage.builder().status("READY").side("WHITE").build();
+                            simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
+                            otherUser.setSide("WHITE");
+                            userService.saveUser(otherUser);
+                        }
                     }
                 }
             }
         } else {
-            Game game = Game.builder().status("WAITING").playerNum(1).turn("WHITE").build();
+            Game game = Game.builder().status("WAITING").playerNum(1).turn("WHITE").board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").build();
             Game updatedGame = gameService.updateGame(game);
             Optional<User> user = userService.getUser(userId);
             if (user.isPresent()) {
