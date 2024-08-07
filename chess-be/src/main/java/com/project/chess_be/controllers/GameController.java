@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -53,20 +55,25 @@ public class GameController {
                     System.out.println(gameMessage.getMoveTo());
                     System.out.println(gameMessage.getTurn());
                     System.out.println("/game/"+user.get().getGame().getGameId().toString());
-                    simpMessagingTemplate.convertAndSend("/game/"+user.get().getGame().getGameId().toString(), gameMessage);
                     // CHESS LOGIC
                     String fen = game.getBoard();
                     Board board = new Board();
                     board.loadFromFen(fen);
                     Square squareMoveFrom = Square.fromValue(message.getMoveFrom().toUpperCase());
                     Square squareMoveTo = Square.fromValue(message.getMoveTo().toUpperCase());
-//                    if (){
-//                        # legal move
-//                    }
-                    board.doMove(new Move(squareMoveFrom, squareMoveTo));
-                    Game updatedGame = Game.builder().gameId(game.getGameId()).turn(newTurn).playerNum(game.getPlayerNum()).board(board.getFen()).build();
-                    gameService.updateGame(updatedGame);
-                    return ResponseEntity.ok(gameMessage);
+                    List<Move> moves = board.legalMoves();
+                    List<String> stringMoves = new ArrayList<String>();
+                    // check legal move
+                    for ( Move move: moves ){
+                        stringMoves.add(move.getFrom().value().concat(move.getTo().value()));
+                    }
+                    if ( stringMoves.contains(squareMoveFrom.value().concat(squareMoveTo.value())) ){
+                        board.doMove(new Move(squareMoveFrom, squareMoveTo));
+                        Game updatedGame = Game.builder().gameId(game.getGameId()).turn(newTurn).playerNum(game.getPlayerNum()).board(board.getFen()).build();
+                        gameService.updateGame(updatedGame);
+                        simpMessagingTemplate.convertAndSend("/game/"+user.get().getGame().getGameId().toString(), gameMessage);
+                        return ResponseEntity.ok(gameMessage);
+                    }
                 } else if (turn.equals("BLACK")) {
                     String newTurn = "WHITE";
                     GameMessage gameMessage = GameMessage.builder()
@@ -82,13 +89,19 @@ public class GameController {
                     board.loadFromFen(fen);
                     Square squareMoveFrom = Square.fromValue(message.getMoveFrom().toUpperCase());
                     Square squareMoveTo = Square.fromValue(message.getMoveTo().toUpperCase());
-//                    if (){
-//                        # legal move
-//                    }
-                    board.doMove(new Move(squareMoveFrom, squareMoveTo));
-                    Game updatedGame = Game.builder().gameId(game.getGameId()).turn(newTurn).playerNum(game.getPlayerNum()).board(board.getFen()).build();
-                    gameService.updateGame(updatedGame);
-                    return ResponseEntity.ok(gameMessage);
+                    List<Move> moves = board.legalMoves();
+                    List<String> stringMoves = new ArrayList<String>();
+                    // check legal move
+                    for ( Move move: moves ){
+                        stringMoves.add(move.getFrom().value().concat(move.getTo().value()));
+                    }
+                    if ( stringMoves.contains(squareMoveFrom.value().concat(squareMoveTo.value())) ){
+                        board.doMove(new Move(squareMoveFrom, squareMoveTo));
+                        Game updatedGame = Game.builder().gameId(game.getGameId()).turn(newTurn).playerNum(game.getPlayerNum()).board(board.getFen()).build();
+                        gameService.updateGame(updatedGame);
+                        simpMessagingTemplate.convertAndSend("/game/"+user.get().getGame().getGameId().toString(), gameMessage);
+                        return ResponseEntity.ok(gameMessage);
+                    }
                 }
             }
         };
