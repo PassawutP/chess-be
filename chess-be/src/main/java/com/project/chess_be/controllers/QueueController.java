@@ -59,6 +59,7 @@ public class QueueController {
                             simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
                             otherUser.setSide("BLACK");
                             userService.saveUser(otherUser);
+                            break;
                         }
                         case 1:
                         {
@@ -72,6 +73,7 @@ public class QueueController {
                             simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
                             otherUser.setSide("WHITE");
                             userService.saveUser(otherUser);
+                            break;
                         }
                     }
                 }
