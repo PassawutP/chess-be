@@ -13,4 +13,6 @@ public class GameMessage {
     private String moveTo;
 
     private String turn;
+
+    private Status status;
 }

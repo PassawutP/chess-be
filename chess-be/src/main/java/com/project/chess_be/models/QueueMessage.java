@@ -8,6 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class QueueMessage {
-    private String status;
-    private String side;
+
+    private Status status;
+
+    private Side side;
 }

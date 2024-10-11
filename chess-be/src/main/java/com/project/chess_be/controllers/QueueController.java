@@ -4,6 +4,8 @@ import com.github.bhlangonijr.chesslib.Board;
 import com.project.chess_be.entities.Game;
 import com.project.chess_be.entities.User;
 import com.project.chess_be.models.QueueMessage;
+import com.project.chess_be.models.Side;
+import com.project.chess_be.models.Status;
 import com.project.chess_be.service.GameService;
 import com.project.chess_be.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +51,13 @@ public class QueueController {
                     switch (randomisedSideInt){
                         case 0:
                         {
-                            QueueMessage senderStatus = QueueMessage.builder().status("READY").side("WHITE").build();
+                            QueueMessage senderStatus = QueueMessage.builder().status(Status.READY).side(Side.WHITE).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
                             senderUser.setSide("WHITE");
                             senderUser.setGame(updatedGame);
                             userService.saveUser(senderUser);
 
-                            QueueMessage otherStatus = QueueMessage.builder().status("READY").side("BLACK").build();
+                            QueueMessage otherStatus = QueueMessage.builder().status(Status.READY).side(Side.BLACK).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
                             otherUser.setSide("BLACK");
                             userService.saveUser(otherUser);
@@ -63,13 +65,13 @@ public class QueueController {
                         }
                         case 1:
                         {
-                            QueueMessage senderStatus = QueueMessage.builder().status("READY").side("BLACK").build();
+                            QueueMessage senderStatus = QueueMessage.builder().status(Status.READY).side(Side.BLACK).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
                             senderUser.setSide("BLACK");
                             senderUser.setGame(updatedGame);
                             userService.saveUser(senderUser);
 
-                            QueueMessage otherStatus = QueueMessage.builder().status("READY").side("WHITE").build();
+                            QueueMessage otherStatus = QueueMessage.builder().status(Status.READY).side(Side.WHITE).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
                             otherUser.setSide("WHITE");
                             userService.saveUser(otherUser);
@@ -88,6 +90,6 @@ public class QueueController {
                 userService.saveUser(senderUser);
             }
         }
-        return ResponseEntity.ok(QueueMessage.builder().status("WAITING").build());
+        return ResponseEntity.ok(QueueMessage.builder().status(Status.WAITING).build());
     }
 }

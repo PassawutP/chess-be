@@ -8,6 +8,7 @@ import com.project.chess_be.entities.User;
 import com.project.chess_be.models.GameMessage;
 import com.project.chess_be.models.GameReceived;
 import com.project.chess_be.models.QueueMessage;
+import com.project.chess_be.models.Status;
 import com.project.chess_be.service.GameService;
 import com.project.chess_be.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,6 @@ public class GameController {
     private final UserService userService;
 
     public GameController(GameService gameService, UserService userService){
-
         this.gameService = gameService;
         this.userService = userService;
     }
@@ -50,11 +50,8 @@ public class GameController {
                             .moveTo(message.getMoveTo())
                             .moveFrom(message.getMoveFrom())
                             .turn(newTurn)
+                            .status(Status.READY)
                             .build();
-                    System.out.println(gameMessage.getMoveFrom());
-                    System.out.println(gameMessage.getMoveTo());
-                    System.out.println(gameMessage.getTurn());
-                    System.out.println("/game/"+user.get().getGame().getGameId().toString());
                     // CHESS LOGIC
                     String fen = game.getBoard();
                     Board board = new Board();
@@ -71,6 +68,13 @@ public class GameController {
                         board.doMove(new Move(squareMoveFrom, squareMoveTo));
                         Game updatedGame = Game.builder().gameId(game.getGameId()).turn(newTurn).playerNum(game.getPlayerNum()).board(board.getFen()).build();
                         gameService.updateGame(updatedGame);
+                        // check isMated()
+                        if ( board.isMated() ){
+                            gameMessage.setStatus(Status.ENDING);
+                        }
+                        else {
+                            gameMessage.setStatus(Status.READY);
+                        }
                         simpMessagingTemplate.convertAndSend("/game/"+user.get().getGame().getGameId().toString(), gameMessage);
                         return ResponseEntity.ok(gameMessage);
                     }
@@ -80,6 +84,7 @@ public class GameController {
                             .moveTo(message.getMoveTo())
                             .moveFrom(message.getMoveFrom())
                             .turn(newTurn)
+                            .status(Status.READY)
                             .build();
                     System.out.println(user.get().getGame().getGameId());
                     simpMessagingTemplate.convertAndSend("/game/"+user.get().getGame().getGameId().toString(), gameMessage);
@@ -99,9 +104,17 @@ public class GameController {
                         board.doMove(new Move(squareMoveFrom, squareMoveTo));
                         Game updatedGame = Game.builder().gameId(game.getGameId()).turn(newTurn).playerNum(game.getPlayerNum()).board(board.getFen()).build();
                         gameService.updateGame(updatedGame);
+                        // check isMated()
+                        if ( board.isMated() ){
+                            gameMessage.setStatus(Status.ENDING);
+                        }
+                        else {
+                            gameMessage.setStatus(Status.READY);
+                        }
                         simpMessagingTemplate.convertAndSend("/game/"+user.get().getGame().getGameId().toString(), gameMessage);
                         return ResponseEntity.ok(gameMessage);
                     }
+
                 }
             }
         };
