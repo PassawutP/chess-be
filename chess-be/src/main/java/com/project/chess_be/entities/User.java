@@ -1,5 +1,6 @@
 package com.project.chess_be.entities;
 
+import com.project.chess_be.models.Side;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,8 @@ public class User {
     @Column( nullable = false )
     private String name;
 
-    private String side;
+    @Enumerated(EnumType.STRING)
+    private Side side;
 
     @ManyToOne
     @JoinColumn( name = "game_id")

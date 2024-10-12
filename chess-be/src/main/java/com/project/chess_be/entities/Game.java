@@ -1,5 +1,7 @@
 package com.project.chess_be.entities;
 
+import com.project.chess_be.models.Side;
+import com.project.chess_be.models.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +21,11 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer gameId;
 
-    private String turn;
+    @Enumerated(EnumType.STRING)
+    private Side turn;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     private String board;
 

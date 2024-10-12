@@ -7,12 +7,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GameMessage {
+public class GameReceived {
+
     private String moveFrom;
 
     private String moveTo;
 
-    private Side turn;
+    private Integer userId;
 
-    private Status status;
 }

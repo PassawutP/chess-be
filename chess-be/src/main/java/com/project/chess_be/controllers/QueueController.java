@@ -41,7 +41,7 @@ public class QueueController {
             int gameId = room.get(randomisedRoomInt).getGameId();
             Optional<Game> getGame = gameService.getGameById(gameId);
             if (getGame.isPresent()){
-                Game game = Game.builder().gameId(gameId).status("READY").playerNum(2).turn("WHITE").board(getGame.get().getBoard()).build();
+                Game game = Game.builder().gameId(gameId).status(Status.READY).playerNum(2).turn(Side.WHITE).board(getGame.get().getBoard()).build();
                 Game updatedGame = gameService.updateGame(game);
                 Optional<User> user = userService.getUser(userId);
                 if (user.isPresent()){
@@ -53,13 +53,13 @@ public class QueueController {
                         {
                             QueueMessage senderStatus = QueueMessage.builder().status(Status.READY).side(Side.WHITE).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
-                            senderUser.setSide("WHITE");
+                            senderUser.setSide(Side.WHITE);
                             senderUser.setGame(updatedGame);
                             userService.saveUser(senderUser);
 
                             QueueMessage otherStatus = QueueMessage.builder().status(Status.READY).side(Side.BLACK).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
-                            otherUser.setSide("BLACK");
+                            otherUser.setSide(Side.BLACK);
                             userService.saveUser(otherUser);
                             break;
                         }
@@ -67,13 +67,13 @@ public class QueueController {
                         {
                             QueueMessage senderStatus = QueueMessage.builder().status(Status.READY).side(Side.BLACK).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+senderUser.getUserId(), senderStatus);
-                            senderUser.setSide("BLACK");
+                            senderUser.setSide(Side.BLACK);
                             senderUser.setGame(updatedGame);
                             userService.saveUser(senderUser);
 
                             QueueMessage otherStatus = QueueMessage.builder().status(Status.READY).side(Side.WHITE).build();
                             simpMessagingTemplate.convertAndSend("/queue/"+otherUser.getUserId(), otherStatus);
-                            otherUser.setSide("WHITE");
+                            otherUser.setSide(Side.WHITE);
                             userService.saveUser(otherUser);
                             break;
                         }
@@ -81,7 +81,7 @@ public class QueueController {
                 }
             }
         } else {
-            Game game = Game.builder().status("WAITING").playerNum(1).turn("WHITE").board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").build();
+            Game game = Game.builder().status(Status.WAITING).playerNum(1).turn(Side.WHITE).board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").build();
             Game updatedGame = gameService.updateGame(game);
             Optional<User> user = userService.getUser(userId);
             if (user.isPresent()) {
