@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface GameRepository extends JpaRepository<Game, Integer> {
-    @Query("SELECT g FROM Game g WHERE g.playerNum = 1")
+    @Query("SELECT g FROM Game g WHERE g.playerNum = 1 AND g.status = WAITING")
     List<Game> getRoomWithPlayerNum();
 }

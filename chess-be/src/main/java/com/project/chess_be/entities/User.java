@@ -19,7 +19,10 @@ public class User {
     private Integer userId;
 
     @Column( nullable = false )
-    private String name;
+    private String username;
+
+    @Column( nullable = false )
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private Side side;
